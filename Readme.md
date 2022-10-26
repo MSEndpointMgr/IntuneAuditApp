@@ -18,4 +18,4 @@ Description: Report on who did any changes in your Intune environment
 
 4. Replace in line 112 where it says a32a07c5-739b-40ce-9b3f-185733d5c0d0 and add your own Log Analytics workspace ID
 
-5. Replace in line 225 where it says https://memtipsandtricks.webhook.office.com/webhookb2/d20c5efe-2f76-4897-8c90-2de8c0f76397@47a13e20-6415-4467-bfd3-b2acf62a3ed2/IncomingWebhook/04b539c6e3e94a0f967026c01783b9e3/b1c3d24c-dca3-4166-bac9-043bca7c3cd6 and add your own Teams hook
+5. Replace in line 225 where it says https://memtipsandtricks.webhook.office.com/webhookb2/d20c5efe-2f76-4897-8c90-2de8c0f76397@47a13e20-6415-4467-bfd3-b2acf62a3ed2/IncomingWebhook/ and add your own Teams hook
