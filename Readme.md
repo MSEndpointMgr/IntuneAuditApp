@@ -8,7 +8,7 @@ Description: Report on who did any changes in your Intune environment
   [![HitCount](https://hits.dwyl.com/MSEndpointMgr/LogicAppCode.svg?style=flat)](http://hits.dwyl.com/MSEndpointMgr/LogicAppCode)
 
 # Logic app code
-## The following code can be put directly into your logic app and work if you configured your envionment described in the [MSEndpointMgr Blog](https://msendpointmgr.com/2022/10/23/installing-m365-apps-as-win32-app-in-intune/)
+## The following code can be put directly into your logic app and work if you configured your envionment described in the [MSEndpointMgr Blog](https://msendpointmgr.com/2022/10/27/running-logic-apps-without-the-need-of-governance/)
 
 1. copy the code from LogicApp code
 
