@@ -1,0 +1,270 @@
+{
+    "definition": {
+        "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+        "actions": {
+            "Create_HTML_table": {
+                "inputs": {
+                    "format": "HTML",
+                    "from": "@body('Select')"
+                },
+                "runAfter": {
+                    "Select": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "Table"
+            },
+            "For_each_row_in_table": {
+                "actions": {
+                    "For_each_row_in_rows": {
+                        "actions": {
+                            "Append_to_array_variable_2": {
+                                "inputs": {
+                                    "name": "Array",
+                                    "value": "@variables('Object')"
+                                },
+                                "runAfter": {
+                                    "Set_variable": [
+                                        "Succeeded"
+                                    ]
+                                },
+                                "type": "AppendToArrayVariable"
+                            },
+                            "ChangedBy": {
+                                "inputs": "@items('For_each_row_in_rows')[2]",
+                                "runAfter": {
+                                    "PolicyName": [
+                                        "Succeeded"
+                                    ]
+                                },
+                                "type": "Compose"
+                            },
+                            "DateTime": {
+                                "inputs": "@items('For_each_row_in_rows')[0]",
+                                "runAfter": {},
+                                "type": "Compose"
+                            },
+                            "Operation": {
+                                "inputs": "@items('For_each_row_in_rows')[3]",
+                                "runAfter": {
+                                    "ChangedBy": [
+                                        "Succeeded"
+                                    ]
+                                },
+                                "type": "Compose"
+                            },
+                            "PolicyName": {
+                                "inputs": "@items('For_each_row_in_rows')[1]",
+                                "runAfter": {
+                                    "DateTime": [
+                                        "Succeeded"
+                                    ]
+                                },
+                                "type": "Compose"
+                            },
+                            "Set_variable": {
+                                "inputs": {
+                                    "name": "Object",
+                                    "value": {
+                                        "ChangedBy": "@{outputs('ChangedBy')}",
+                                        "Operation": "@{outputs('Operation')}",
+                                        "Policy": "@{outputs('PolicyName')}",
+                                        "TimeGenerated": "@{outputs('DateTime')}"
+                                    }
+                                },
+                                "runAfter": {
+                                    "Operation": [
+                                        "Succeeded"
+                                    ]
+                                },
+                                "type": "SetVariable"
+                            }
+                        },
+                        "foreach": "@items('For_each_row_in_table')?['rows']",
+                        "runAfter": {},
+                        "type": "Foreach"
+                    }
+                },
+                "foreach": "@body('Parse_JSON')?['tables']",
+                "runAfter": {
+                    "Parse_JSON": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "Foreach"
+            },
+            "HTML_Styling_for_the_mail_output": {
+                "inputs": "<style>\ntable {\n  border: 1px solid #1C6EA4;\n  background-color: #EEEEEE;\n  width: 100%;\n  text-align: left;\n  border-collapse: collapse;\n}\ntable td, table th {\n  border: 1px solid #AAAAAA;\n  padding: 3px 2px;\n}\ntable tbody td {\n  font-size: 13px;\n}\ntable thead {\n  background: #1C6EA4;\n  border-bottom: 2px solid #444444;\n}\ntable thead th {\n  font-size: 15px;\n  font-weight: bold;\n  color: #FFFFFF;\n  border-left: 2px solid #D0E4F5;\n}\ntable thead th:first-child {\n  border-left: none;\n}\n</style>@{body('Create_HTML_table')}",
+                "runAfter": {
+                    "Create_HTML_table": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "Compose"
+            },
+            "HTTP": {
+                "inputs": {
+                    "authentication": {
+                        "audience": "https://api.loganalytics.io",
+                        "type": "ManagedServiceIdentity"
+                    },
+                    "method": "GET",
+                    "uri": "https://api.loganalytics.io/v1/workspaces/a32a07c5-739b-40ce-9b3f-185733d5c0d0/query?query=IntuneAuditLogs%20|%20where%20OperationName%20==%20\"Patch%20DeviceConfiguration\"%20or%20OperationName%20==%20\"Patch%20DeviceManagementConfigurationPolicy\"%20or%20OperationName%20==%20\"Patch%20DeviceManagementIntent\"%20or%20OperationName%20==%20\"Patch%20DeviceCompliancePolicy\"%20or%20OperationName%20==%20\"Update%20GroupPolicyConfiguration\"%20or%20OperationName%20==%20\"Create%20DeviceConfiguration\"%20or%20OperationName%20==%20\"Create%20DeviceManagementConfigurationPolicy\"%20or%20OperationName%20==%20\"Create%20DeviceManagementIntent\"%20or%20OperationName%20==%20\"Create%20DeviceCompliancePolicy\"%20or%20OperationName%20==%20\"Create%20GroupPolicyConfiguration\"%20or%20OperationName%20==%20\"Delete%20DeviceConfiguration\"%20or%20OperationName%20==%20\"createDeviceHealthScript%20DeviceHealthScript\"%20or%20OperationName%20==%20\"patchDeviceHealthScript%20DeviceHealthScript\"%20or%20OperationName%20==%20\"deleteDeviceHealthScript%20DeviceHealthScript\"%20or%20OperationName%20==%20\"createDeviceManagementScript%20DeviceManagementScript\"%20or%20OperationName%20==%20\"patchDeviceManagementScript%20DeviceManagementScript\"%20or%20OperationName%20==%20\"deleteDeviceManagementScript%20DeviceManagementScript\"%20or%20OperationName%20==%20\"Delete%20DeviceManagementConfigurationPolicy\"%20or%20OperationName%20==%20\"Delete%20DeviceManagementIntent\"%20or%20OperationName%20==%20\"Delete%20GroupPolicyConfiguration\"%20or%20OperationName%20==%20\"Delete%20DeviceCompliancePolicy\"%20or%20OperationName%20==%20\"Patch%20MobileApp\"%20or%20OperationName%20==%20\"Create%20MobileApp\"%20or%20OperationName%20==%20\"Delete%20MobileApp\"%20or%20OperationName%20==%20\"Create%20WindowsFeatureUpdateProfile\"%20or%20OperationName%20==%20\"Patch%20WindowsFeatureUpdateProfile\"%20or%20OperationName%20==%20\"Delete%20WindowsFeatureUpdateProfile\"%20or%20OperationName%20==%20\"Create%20WindowsQualityUpdateProfile\"%20or%20OperationName%20==%20\"Patch%20WindowsQualityUpdateProfile\"%20or%20OperationName%20==%20\"Delete%20WindowsQualityUpdateProfile\"%20|%20extend%20PropertiesJson%20=%20parse_json(Properties)%20|%20where%20TimeGenerated%20>%20now()%20-%2030days%20|%20extend%20ActorJson%20=%20parse_json(PropertiesJson.Actor)%20|%20extend%20Policy%20=%20replace_regex(tostring(todynamic(Properties).TargetDisplayNames),%20@'[\"\\[\\]]',%20\"\")%20|%20extend%20ChangedBy%20=%20todynamic(Properties).Actor.UPN%20|%20project%20TimeGenerated=TimeGenerated,Policy,ChangedBy,Operation=OperationName%20|%20order%20by%20TimeGenerated"
+                },
+                "runAfter": {
+                    "Initialize_variable_-_Array": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "Http"
+            },
+            "Initialize_variable_-_Array": {
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "Array",
+                            "type": "array"
+                        }
+                    ]
+                },
+                "runAfter": {
+                    "Initialize_variable_-_Object": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "InitializeVariable"
+            },
+            "Initialize_variable_-_Object": {
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "Object",
+                            "type": "object"
+                        }
+                    ]
+                },
+                "runAfter": {},
+                "type": "InitializeVariable"
+            },
+            "Parse_JSON": {
+                "inputs": {
+                    "content": "@body('HTTP')",
+                    "schema": {
+                        "properties": {
+                            "tables": {
+                                "items": {
+                                    "properties": {
+                                        "columns": {
+                                            "items": {
+                                                "properties": {
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "type": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "name",
+                                                    "type"
+                                                ],
+                                                "type": "object"
+                                            },
+                                            "type": "array"
+                                        },
+                                        "name": {
+                                            "type": "string"
+                                        },
+                                        "rows": {
+                                            "items": {
+                                                "type": "array"
+                                            },
+                                            "type": "array"
+                                        }
+                                    },
+                                    "required": [
+                                        "name",
+                                        "columns",
+                                        "rows"
+                                    ],
+                                    "type": "object"
+                                },
+                                "type": "array"
+                            }
+                        },
+                        "type": "object"
+                    }
+                },
+                "runAfter": {
+                    "HTTP": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "ParseJson"
+            },
+            "Post_to_Teams": {
+                "inputs": {
+                    "body": {
+                        "sections": [
+                            {
+                                "activityImage": "https://avatars.githubusercontent.com/u/30185934?s=200&v=4",
+                                "activitySubtitle": "Delivered by - MSEndpointMgr",
+                                "activityTitle": "Configuration changes in Microsoft Intune last 24h",
+                                "facts": [
+                                    {
+                                        "name": "Changes",
+                                        "value": "@{outputs('HTML_Styling_for_the_mail_output')}"
+                                    }
+                                ]
+                            }
+                        ],
+                        "summary": "Every 24h we will leverage all changes happend to our services in MSEndpointMgr - Microsoft Intune",
+                        "themeColor": "0076D7"
+                    },
+                    "method": "POST",
+                    "uri": "https://memtipsandtricks.webhook.office.com/webhookb2/d20c5efe-2f76-4897-8c90-2de8c0f76397@47a13e20-6415-4467-bfd3-b2acf62a3ed2/IncomingWebhook/04b539c6e3e94a0f967026c01783b9e3/b1c3d24c-dca3-4166-bac9-043bca7c3cd6"
+                },
+                "runAfter": {
+                    "HTML_Styling_for_the_mail_output": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "Http"
+            },
+            "Select": {
+                "inputs": {
+                    "from": "@variables('Array')",
+                    "select": {
+                        "1. Intune Object": "@item()['Policy']",
+                        "2. Operation": "@item()['Operation']",
+                        "3. Changed By": "@item()['ChangedBy']",
+                        "4. Time": "@item()['TimeGenerated']"
+                    }
+                },
+                "runAfter": {
+                    "For_each_row_in_table": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "Select"
+            }
+        },
+        "contentVersion": "1.0.0.0",
+        "outputs": {},
+        "parameters": {},
+        "triggers": {
+            "Recurrence": {
+                "evaluatedRecurrence": {
+                    "frequency": "Week",
+                    "interval": 3
+                },
+                "recurrence": {
+                    "frequency": "Day",
+                    "interval": 1
+                },
+                "type": "Recurrence"
+            }
+        }
+    },
+    "parameters": {}
+}
